@@ -1,19 +1,14 @@
 #include <iostream>
-#include <errno.h>
-#include <wiringPiSPI.h>
-#include <unistd.h>
-
-#define CHANNEL 0
+#include "SPI_communicator.h"
 
 int main(void){
-	int fd, result;
+	int result;
 	unsigned char buffer[100];
+  SPI_communicator comm1(0, 100000, SPI_DOWN_EDGE);
 	buffer[0] = 0xCC;
 	buffer[1] = 0xCC;
 
-	fd = wiringPiSPISetupMode(CHANNEL, 100000, 1);
-
-	result = write(fd, buffer, 2);
+  result = comm1.transmit(buffer, 2);
 
 	std::cout<<result<<std::endl;
 	std::cout<<(int)buffer[0]<<" "<<(int)buffer[1]<<std::endl;
