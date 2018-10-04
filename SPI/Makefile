@@ -3,7 +3,7 @@ CC_VERSION = -std=c++11
 CFFLAGS = -W -WALL
 TARGET = spi_com
 LINK = -lwiringPi
-OBJECTS = sample_main.o SPI_communicator.o
+OBJECTS = sample_main.o SPI_communicator.o GPIO_communicator.o
 
 all : $(TARGET)
 
