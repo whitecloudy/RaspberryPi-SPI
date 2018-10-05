@@ -50,6 +50,16 @@
 #define DATA_MASK0 0xFFFC
 
 #define MAX_channel_num 40
+#define ALL_vout_num -1
+#define Group0_ALL_vout_num -2
+#define Group1_ALL_vout_num -3
+#define Group2_ALL_vout_num -4
+#define Group3_ALL_vout_num -5
+#define Group4_ALL_vout_num -6
+
+#define Group_bit(vout_num) ((vout_num/8)+1)
+#define Channel_bit(vout_num) (vout_num%8)
+#define Address_bit_assembly(group, channel) (((group<<3)+channel)&0x3F)
 
 enum offset_values {DAC0_offset = 0, DAC1_offset, DAC2_offset, DAC_trim_offset, DAC_trim_gain};
 
@@ -59,6 +69,8 @@ const char ATTENUATOR[] = {ANT1_attenuator, ANT2_attenuator, ANT3_attenuator, AN
 
 class Vout_controller{
   private:
+    SPI_communicator spi_comm;
+    GPIO_communicator gpio_comm;
     char buffer[Serial_Word_Size]= {0};
     int DAC_trim_offset_value[MAX_channel_num] = {0};
     int DAC_trim_gain_value[MAX_channel_num] = {0};
@@ -70,7 +82,9 @@ class Vout_controller{
   private:
     int serial_word_maker(int mode_bits, int address_function, int data);
     int addres_maker(int vout_num);
-    
+
+    int data_sender();
+    int data_apply();
 
   public:
     Vout_controller();
