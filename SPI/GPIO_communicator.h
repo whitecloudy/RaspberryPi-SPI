@@ -3,8 +3,8 @@
 #include <unistd.h>
 #include <time.h>
 
-#define LDAC 6
-#define SYNC 5
+#define GPIO_UP 1
+#define GPIO_DOWN 0
 
 class GPIO_communicator{
   private:

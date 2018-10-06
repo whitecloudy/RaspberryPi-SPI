@@ -1,13 +1,13 @@
 #include "Vout_controller.h"
 
-Vout_controller::Vout_controller(){
+Vout_controller::Vout_controller() : spi_comm(0, 20000, SPI_DOWN_EDGE), ldac(LDAC_pin, GPIO_UP), sync(SYNC_pin, GPIO_DOWN){
   for(int i = 0; i<MAX_channel_num; i++){
     DAC_trim_offset_value[i] = DAC_trim_offset_default;
     DAC_trim_gain_value[i] = DAC_trim_gain_default;
   }
 }
 
-Vout_controller::Vout_controller(int calibrated_offset_value[], int calibrated_gain_value[]){
+Vout_controller::Vout_controller(int calibrated_offset_value[], int calibrated_gain_value[]) : spi_comm(0, SPI_speed, SPI_DOWN_EDGE), ldac(LDAC_pin, GPIO_UP), sync(SYNC_pin, GPIO_DOWN){
   for(int i = 0; i<MAX_channel_num; i++){
     DAC_trim_offset_value[i] = calibrated_offset_value[i];
     DAC_trim_gain_value[i] = calibrated_gain_value[i];
@@ -52,6 +52,17 @@ int Vout_controller::addres_maker(int vout_num){
   }
 }
 
+int Vout_controller::data_sender(){
+  sync.give_signal(30);
+  return spi_comm.transmit(buffer, Serial_Word_Size);
+}
+
+int Vout_controller::data_apply() {
+  sync.give_signal(30);
+  return ldac.give_signal(20);
+}
+
+
 int Vout_controller::offset_modify(offset_values offset_num, int vout_function, int value){
 
   if((value < 0)||(value > MAX_offset_gain)||(offset_num < DAC0_offset) ||(offset_num > DAC_trim_gain))
@@ -86,4 +97,31 @@ int Vout_controller::offset_modify(offset_values offset_num, int vout_function, 
       break;
   }
 
+  serial_word_maker(mode_bits, vout_function, value);
+  return data_sender();
+}
+
+int Vout_controller::voltage_modify(int vout_num, float voltage){
+  int mode_bits = 0;
+  int offset_code;
+  switch(Group_bit(vout_num)){
+    case 1:
+      offset_code = DAC0_offset_value;
+      break;
+    case 2:
+      offset_code = DAC1_offset_value;
+      break;
+    case 3:
+    case 4:
+    case 5:
+      offset_code = DAC2_offset_value;
+      break;
+    default:
+      return 1;
+  }
+  int dac_value = (voltage - 12)*16384 + offset_code;
+  dac_value = dac_value & MAX_offset_gain;
+
+  serial_word_maker(mode_bits, addres_maker(vout_num), dac_value);
+  return data_sender();
 }

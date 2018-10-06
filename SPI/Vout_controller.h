@@ -61,6 +61,10 @@
 #define Channel_bit(vout_num) (vout_num%8)
 #define Address_bit_assembly(group, channel) (((group<<3)+channel)&0x3F)
 
+#define LDAC_pin 5
+#define SYNC_pin 6
+#define SPI_speed 20000
+
 enum offset_values {DAC0_offset = 0, DAC1_offset, DAC2_offset, DAC_trim_offset, DAC_trim_gain};
 
 
@@ -70,8 +74,8 @@ const char ATTENUATOR[] = {ANT1_attenuator, ANT2_attenuator, ANT3_attenuator, AN
 class Vout_controller{
   private:
     SPI_communicator spi_comm;
-    GPIO_communicator gpio_comm;
-    char buffer[Serial_Word_Size]= {0};
+    GPIO_communicator ldac, sync;
+    unsigned char buffer[Serial_Word_Size]= {0};
     int DAC_trim_offset_value[MAX_channel_num] = {0};
     int DAC_trim_gain_value[MAX_channel_num] = {0};
     
@@ -84,11 +88,12 @@ class Vout_controller{
     int addres_maker(int vout_num);
 
     int data_sender();
-    int data_apply();
 
   public:
     Vout_controller();
     Vout_controller(int calibrated_offset_value[], int calibrated_gain_value[]);
     int offset_modify(offset_values offset_num, int vout_function, int value);
+    int voltage_modify(int vout_num, float voltage);
+    int data_apply();
 
 };

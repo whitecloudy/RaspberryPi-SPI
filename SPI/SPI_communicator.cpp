@@ -1,7 +1,7 @@
 #include "SPI_communicator.h"
 
 SPI_communicator::SPI_communicator(int channel, int kHz_speed, int mode){
-  spi_fd = wiringPiSPISetupMode(channel, kHz_speed, mode);
+  spi_fd = wiringPiSPISetupMode(channel, kHz_speed*1000, mode);
 }
 
 SPI_communicator::~SPI_communicator(){
