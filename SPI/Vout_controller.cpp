@@ -124,5 +124,8 @@ int Vout_controller::voltage_modify(int vout_num, float voltage){
   dac_value = dac_value & MAX_offset_gain;
 
   serial_word_maker(mode_bits, addres_maker(vout_num), dac_value);
-  return data_sender();
+  int result = data_sender();
+  if(result == 1)
+    std::cout<<"data send error"<<std::endl;
+  return result;
 }
