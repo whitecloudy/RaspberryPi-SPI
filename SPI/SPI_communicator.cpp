@@ -9,11 +9,18 @@ SPI_communicator::~SPI_communicator(){
 }
 
 int SPI_communicator::transmit(const unsigned char * buffer, int size){
-  return write(spi_fd, buffer, size);
+  int result = write(spi_fd, buffer, size);
+  if(result != size)
+    return 1;
+  return 0;
 }
 
 int SPI_communicator::transmit(std::string buffer){
-  return write(spi_fd, buffer.c_str(), buffer.length());
+  int result = write(spi_fd, buffer.c_str(), buffer.length());
+
+  if(result != (int)buffer.length())
+    return 1;
+  return 0;
 }
 
 
