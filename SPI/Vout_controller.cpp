@@ -117,6 +117,7 @@ int Vout_controller::voltage_modify(int vout_num, float voltage){
       offset_code = DAC2_offset_value;
       break;
     default:
+      std::cout<<"wrong group bit"<<std::endl;
       return 1;
   }
   int dac_value = (voltage - 12)*16384 + offset_code;
