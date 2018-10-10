@@ -14,8 +14,10 @@ int main(int argc, char * argv[]){
 
   Vout_controller v1;
 
-  v1.voltage_modify(vout_num, voltage);
-  v1.data_apply();
+  if(v1.voltage_modify(vout_num, voltage))
+	  std::cout<<"error1"<<std::endl;
+  if(v1.data_apply())
+	  std::cout<<"error2"<<std::endl;
 
 
 	return 0;
