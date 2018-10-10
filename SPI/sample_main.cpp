@@ -1,16 +1,22 @@
 #include <iostream>
-#include "SPI_communicator.h"
+#include <cstdlib>
+#include "Vout_controller.h"
 
-int main(void){
-	int result;
-	unsigned char buffer[100];
-  SPI_communicator comm1(0, 100000, SPI_DOWN_EDGE);
-	buffer[0] = 0xCC;
-	buffer[1] = 0xCC;
+int main(int argc, char * argv[]){
+  
+  if(argc < 3){
+    std::cout<<"not enough arguments"<<std::endl;
+    return 1;
+  }
+  int vout_num = atoi(argv[1]);
+  float voltage = atof(argv[2]);
 
-  result = comm1.transmit(buffer, 2);
 
-	std::cout<<result<<std::endl;
-	std::cout<<(int)buffer[0]<<" "<<(int)buffer[1]<<std::endl;
+  Vout_controller v1;
+
+  v1.voltage_modify(vout_num, voltage);
+  v1.data_apply();
+
+
 	return 0;
 }
