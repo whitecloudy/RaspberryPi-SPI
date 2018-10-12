@@ -6,8 +6,8 @@ int main(int argc, char * argv[]){
   
   Vout_controller v1;
 
-  int data;
-  std::cin>>data;
+  v1.print_all_offset();
+
   
   return 0;
 }

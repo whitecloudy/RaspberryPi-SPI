@@ -4,7 +4,6 @@
 #include "csv/csv.h"
 #include <string>
 
-
 Vout_controller::Vout_controller() : spi_comm(0, SPI_speed, SPI_DOWN_EDGE), ldac(LDAC_pin, GPIO_UP), sync(SYNC_pin, GPIO_DOWN){
   if(offset_data_reader())
     std::cout<<"Error : file input output crashed"<<std::endl;
@@ -235,4 +234,14 @@ int Vout_controller::voltage_modify(int vout_num, float voltage){
   if(result)
     std::cout<<"data send error : "<<result<<std::endl;
   return result;
+}
+
+int Vout_controller::print_all_offset(){
+  std::cout<<"Group_offset"<<std::endl<<DAC0_offset_value<<" "<<DAC1_offset_value<<" "<<DAC2_offset_value<<std::endl<<std::endl;
+  for(int i = 0;i<MAX_channel_num;i++){
+    std::cout<<"Vout number "<<i<<std::endl;
+    std::cout<<DAC_trim_offset_value[i]<<" "<<DAC_trim_gain_value[i]<<std::endl;
+  }
+
+  return 0;
 }

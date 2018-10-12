@@ -102,7 +102,7 @@ class Vout_controller{
     int offset_refresh();
     int voltage_modify(int vout_num, float voltage);
     int data_apply();
-
+    int print_all_offset();
 };
 
 #endif
