@@ -16,6 +16,7 @@ int GPIO_communicator::give_signal(int nano_time){
   digitalWrite(pin_num, !default_status);
   int result = nanosleep(&t1,NULL);
   digitalWrite(pin_num, default_status);
+  
 
   return result;
 }

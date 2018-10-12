@@ -1,6 +1,6 @@
 #include "Vout_controller.h"
 
-Vout_controller::Vout_controller() : spi_comm(0, 20000, SPI_DOWN_EDGE), ldac(LDAC_pin, GPIO_UP), sync(SYNC_pin, GPIO_DOWN){
+Vout_controller::Vout_controller() : spi_comm(0, SPI_speed, SPI_DOWN_EDGE), ldac(LDAC_pin, GPIO_UP), sync(SYNC_pin, GPIO_DOWN){
   for(int i = 0; i<MAX_channel_num; i++){
     DAC_trim_offset_value[i] = DAC_trim_offset_default;
     DAC_trim_gain_value[i] = DAC_trim_gain_default;
@@ -16,11 +16,11 @@ Vout_controller::Vout_controller(int calibrated_offset_value[], int calibrated_g
 
 int Vout_controller::serial_word_maker(int mode_bits, int address_function, int data){
   //checking parameters
-  if((mode_bits >= 0)&&(mode_bits <= 0x3)
-      && ((address_function>=0)&&(address_function<=0x3F))
-      && (((mode_bits == 0)&&((data>=0)&&(data<=0xFFFF)))
-         || ((data>=0)&&(data<=0x3FFF))))
-  {
+  if(((address_function>=0)&&(address_function<=0x3F))
+    && ((((mode_bits>0)&&(mode_bits<=0x3)) && ((data>=0)&&(data<=0x3FFF)))
+	||((mode_bits==0)&&((data>=0)&&(data<=0xFFFF))))
+    )
+   {
     if(mode_bits != 0)
       data = (data<<2)&(DATA_MASK0);
     //make buffer
@@ -30,7 +30,11 @@ int Vout_controller::serial_word_maker(int mode_bits, int address_function, int 
 
     return 0;
   }else //if values are wrong
+  {
+    std::cout<<"serial word making error!"<<std::endl;
+    std::cout<<mode_bits<<" "<<address_function<<" "<<data<<std::endl;
     return 1;
+  }
 }
 
 int Vout_controller::addres_maker(int vout_num){
@@ -102,7 +106,7 @@ int Vout_controller::offset_modify(offset_values offset_num, int vout_function, 
 }
 
 int Vout_controller::voltage_modify(int vout_num, float voltage){
-  int mode_bits = 0;
+  int mode_bits = 3;
   int offset_code;
   switch(Group_bit(vout_num)){
     case 1:
@@ -120,7 +124,7 @@ int Vout_controller::voltage_modify(int vout_num, float voltage){
       std::cout<<"wrong group bit"<<std::endl;
       return 1;
   }
-  int dac_value = (voltage - 12)*16384 + offset_code;
+  int dac_value = voltage*16384/12 + offset_code;
   dac_value = dac_value & MAX_offset_gain;
 
   serial_word_maker(mode_bits, addres_maker(vout_num), dac_value);

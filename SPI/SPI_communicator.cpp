@@ -1,4 +1,5 @@
 #include "SPI_communicator.h"
+#include <cstdio>
 
 SPI_communicator::SPI_communicator(int channel, int kHz_speed, int mode){
   spi_fd = wiringPiSPISetupMode(channel, kHz_speed*1000, mode);
@@ -10,6 +11,8 @@ SPI_communicator::~SPI_communicator(){
 
 int SPI_communicator::transmit(const unsigned char * buffer, int size){
   int result = write(spi_fd, buffer, size);
+
+  std::cout<<(int)buffer[0]<<" "<<(int)buffer[1]<<" "<<(int)buffer[2]<<std::endl;
   if(result != size)
     return 1;
   return 0;

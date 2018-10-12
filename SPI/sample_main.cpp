@@ -19,6 +19,9 @@ int main(int argc, char * argv[]){
   if(v1.data_apply())
 	  std::cout<<"error2"<<std::endl;
 
+  int data;
+  std::cin>>data;
+
 
 	return 0;
 }

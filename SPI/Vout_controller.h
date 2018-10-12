@@ -36,7 +36,7 @@
 #define ANT15_attenuator 33
 #define ANT16_attenuator 32
 
-#define MAX_offset_gain 0xCFFF
+#define MAX_offset_gain 0x3FFF
 #define DAC_trim_offset_default  0x2000
 #define DAC_trim_gain_default    0x3FFF
 #define DAC0_offset_default 0x1555
@@ -63,7 +63,7 @@
 
 #define LDAC_pin 5
 #define SYNC_pin 6
-#define SPI_speed 20000
+#define SPI_speed 5
 
 enum offset_values {DAC0_offset = 0, DAC1_offset, DAC2_offset, DAC_trim_offset, DAC_trim_gain};
 
