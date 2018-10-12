@@ -1,10 +1,13 @@
 #include "Vout_controller.h"
+#include <fstream>
+#include <time.h>
+#include "csv/csv.h"
+#include <string>
+
 
 Vout_controller::Vout_controller() : spi_comm(0, SPI_speed, SPI_DOWN_EDGE), ldac(LDAC_pin, GPIO_UP), sync(SYNC_pin, GPIO_DOWN){
-  for(int i = 0; i<MAX_channel_num; i++){
-    DAC_trim_offset_value[i] = DAC_trim_offset_default;
-    DAC_trim_gain_value[i] = DAC_trim_gain_default;
-  }
+  if(offset_data_reader())
+    std::cout<<"Error : file input output crashed"<<std::endl;
 }
 
 Vout_controller::Vout_controller(int calibrated_offset_value[], int calibrated_gain_value[]) : spi_comm(0, SPI_speed, SPI_DOWN_EDGE), ldac(LDAC_pin, GPIO_UP), sync(SYNC_pin, GPIO_DOWN){
@@ -14,13 +17,100 @@ Vout_controller::Vout_controller(int calibrated_offset_value[], int calibrated_g
   }
 }
 
+int Vout_controller::offset_data_reader(){
+  std::fstream file_checker(FILE_name,std::fstream::in);
+  if(file_checker.is_open()){
+    file_checker.close();
+    io::CSVReader<3> file(FILE_name);
+    file.read_header(io::ignore_extra_column, "type","number", "value");
+    std::string type; int num, value;
+    while(file.read_row(type, num, value)){
+      if(type == "Group"){
+        switch(num){
+          case 0:
+            DAC0_offset_value = value;
+            break;
+          case 1:
+            DAC1_offset_value = value;
+            break;
+          case 2:
+            DAC2_offset_value = value;
+            break;
+          default:
+            std::cout<<"Group offset number error"<<std::endl;
+            return 1;
+        }
+      }else if(type == "Offset"){
+        if((num >=0) && (num< MAX_channel_num))
+          DAC_trim_offset_value[num] = value;
+        else{
+          std::cout<<"Offset number error"<<std::endl;
+          return 1;
+        }
+      }else if(type == "Gain"){
+        if((num >=0) && (num< MAX_channel_num))
+          DAC_trim_gain_value[num] = value;
+        else{
+          std::cout<<"Offset number error"<<std::endl;
+          return 1;
+        }
+      }else{
+        std::cout<<"file read error"<<std::endl;
+        return 1;
+      }
+    }
+  }else{
+    file_checker.close();
+    for(int i = 0; i<MAX_channel_num; i++){
+      DAC_trim_offset_value[i] = DAC_trim_offset_default;
+      DAC_trim_gain_value[i] = DAC_trim_gain_default;
+    }
+    offset_data_writer();
+  }
+  return 0;
+}
+
+int Vout_controller::offset_data_writer(){
+  std::fstream file(FILE_name, std::fstream::out);
+  file<<"type"<<","<<"number"<<","<<"value"<<std::endl;
+
+  file<<"Group"<<","<<0<<","<<DAC0_offset_value<<std::endl;
+  file<<"Group"<<","<<1<<","<<DAC1_offset_value<<std::endl;
+  file<<"Group"<<","<<2<<","<<DAC2_offset_value<<std::endl;
+
+  for(int i = 0; i<MAX_channel_num; i++){
+    file<<"Offset"<<","<<i<<","<<DAC_trim_offset_value[i]<<std::endl;
+    file<<"Gain"<<","<<i<<","<<DAC_trim_gain_value[i]<<std::endl;
+  }
+
+  file.close();
+
+  return 0;
+}
+
+int Vout_controller::offset_refresh(){
+  int result = 0;
+  result = result||offset_modify(DAC0_offset,0, DAC0_offset_value);
+  result = result||offset_modify(DAC1_offset,0, DAC1_offset_value);
+  result = result||offset_modify(DAC2_offset,0, DAC2_offset_value);
+
+  for(int i = 0;i<MAX_channel_num;i++){
+    result = result||offset_modify(DAC_trim_offset, i, DAC_trim_offset_value[i]);
+    result = result||offset_modify(DAC_trim_gain, i, DAC_trim_gain_value[i]);
+  }
+
+  result = result||data_apply();
+
+  return result;
+}
+
 int Vout_controller::serial_word_maker(int mode_bits, int address_function, int data){
   //checking parameters
   if(((address_function>=0)&&(address_function<=0x3F))
-    && ((((mode_bits>0)&&(mode_bits<=0x3)) && ((data>=0)&&(data<=0x3FFF)))
-	||((mode_bits==0)&&((data>=0)&&(data<=0xFFFF))))
+      && ((((mode_bits>0)&&(mode_bits<=0x3)) && ((data>=0)&&(data<=0x3FFF)))
+        ||((mode_bits==0)&&((data>=0)&&(data<=0xFFFF))))
     )
-   {
+  {
     if(mode_bits != 0)
       data = (data<<2)&(DATA_MASK0);
     //make buffer
@@ -58,12 +148,22 @@ int Vout_controller::addres_maker(int vout_num){
 
 int Vout_controller::data_sender(){
   sync.give_signal(30);
-  return spi_comm.transmit(buffer, Serial_Word_Size);
+  int result = spi_comm.transmit(buffer, Serial_Word_Size);
+  struct timespec t12;
+  t12.tv_sec = 0;
+  t12.tv_nsec = 20;
+  nanosleep(&t12,NULL);
+  return result;
 }
 
 int Vout_controller::data_apply() {
   sync.give_signal(30);
-  return ldac.give_signal(20);
+  int result = ldac.give_signal(20);
+  struct timespec t12;
+  t12.tv_sec = 0;
+  t12.tv_nsec = 20;
+  nanosleep(&t12,NULL);
+  return result;
 }
 
 

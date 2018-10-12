@@ -1,3 +1,6 @@
+#ifndef __VOUT_CONTROLLER__
+#define __VOUT_CONTROLLER__
+
 #include <iostream>
 #include "SPI_communicator.h"
 #include "GPIO_communicator.h"
@@ -65,6 +68,8 @@
 #define SYNC_pin 6
 #define SPI_speed 5
 
+#define FILE_name "offset_saved_file.csv"
+
 enum offset_values {DAC0_offset = 0, DAC1_offset, DAC2_offset, DAC_trim_offset, DAC_trim_gain};
 
 
@@ -86,14 +91,18 @@ class Vout_controller{
   private:
     int serial_word_maker(int mode_bits, int address_function, int data);
     int addres_maker(int vout_num);
-
     int data_sender();
+    int offset_data_reader();
+    int offset_data_writer();
 
   public:
     Vout_controller();
     Vout_controller(int calibrated_offset_value[], int calibrated_gain_value[]);
     int offset_modify(offset_values offset_num, int vout_function, int value);
+    int offset_refresh();
     int voltage_modify(int vout_num, float voltage);
     int data_apply();
 
 };
+
+#endif
