@@ -59,8 +59,10 @@ int Vout_controller::offset_data_reader(){
         return 1;
       }
     }
+    std::cout<<"Offset Saved file load complete"<<std::endl;
   }else{
     file_checker.close();
+    std::cout<<"No offset file found"<<std::endl;
     for(int i = 0; i<MAX_channel_num; i++){
       DAC_trim_offset_value[i] = DAC_trim_offset_default;
       DAC_trim_gain_value[i] = DAC_trim_gain_default;
@@ -84,6 +86,7 @@ int Vout_controller::offset_data_writer(){
   }
 
   file.close();
+  std::cout<<"Offset save complete"<<std::endl;
 
   return 0;
 }
