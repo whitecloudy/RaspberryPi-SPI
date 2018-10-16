@@ -40,11 +40,11 @@
 #define ANT16_attenuator 32
 
 #define MAX_offset_gain 0x3FFF
-#define DAC_trim_offset_default  0x2000
-#define DAC_trim_gain_default    0x3FFF
-#define DAC0_offset_default 0x1555
-#define DAC1_offset_default 0x1555
-#define DAC2_offset_default 0x1555
+#define Vout_offset_default  0x2000
+#define Vout_gain_default    0x3FFF
+#define Group0_offset_default 0x1555
+#define Group1_offset_default 0x1555
+#define Group234_offset_default 0x1555
 #define DAC_offset_switch false
 
 #define Serial_Word_Size 3
@@ -70,7 +70,7 @@
 
 #define FILE_name "offset_saved_file.csv"
 
-enum offset_values {DAC0_offset = 0, DAC1_offset, DAC2_offset, DAC_trim_offset, DAC_trim_gain};
+enum offset_types {Group0_offset = 0, Group1_offset, Group234_offset, Vout_offset, Vout_gain};
 
 
 const char PHASE[] = {ANT1_phase, ANT2_phase, ANT3_phase, ANT4_phase, ANT5_phase, ANT6_phase, ANT7_phase, ANT8_phase, ANT9_phase, ANT10_phase, ANT11_phase, ANT12_phase, ANT13_phase, ANT14_phase, ANT15_phase, ANT16_phase};
@@ -81,12 +81,12 @@ class Vout_controller{
     SPI_communicator spi_comm;
     GPIO_communicator ldac, sync;
     unsigned char buffer[Serial_Word_Size]= {0};
-    int DAC_trim_offset_value[MAX_channel_num] = {0};
-    int DAC_trim_gain_value[MAX_channel_num] = {0};
+    int Vout_offset_value[MAX_channel_num] = {0};
+    int Vout_gain_value[MAX_channel_num] = {0};
     
-    int DAC0_offset_value = DAC0_offset_default;
-    int DAC1_offset_value = DAC1_offset_default;
-    int DAC2_offset_value = DAC2_offset_default;
+    int Group0_offset_value = Group0_offset_default;
+    int Group1_offset_value = Group1_offset_default;
+    int Group234_offset_value = Group234_offset_default;
     
   private:
     int serial_word_maker(int mode_bits, int address_function, int data);
@@ -98,7 +98,7 @@ class Vout_controller{
   public:
     Vout_controller();
     Vout_controller(int calibrated_offset_value[], int calibrated_gain_value[]);
-    int offset_modify(offset_values offset_num, int vout_function, int value);
+    int offset_modify(offset_types offset_num, int vout_function, int value);
     int offset_refresh();
     int voltage_modify(int vout_num, float voltage);
     int data_apply();

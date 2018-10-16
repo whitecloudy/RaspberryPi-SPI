@@ -11,10 +11,21 @@ Vout_controller::Vout_controller() : spi_comm(0, SPI_speed, SPI_DOWN_EDGE), ldac
 
 Vout_controller::Vout_controller(int calibrated_offset_value[], int calibrated_gain_value[]) : spi_comm(0, SPI_speed, SPI_DOWN_EDGE), ldac(LDAC_pin, GPIO_UP), sync(SYNC_pin, GPIO_DOWN){
   for(int i = 0; i<MAX_channel_num; i++){
-    DAC_trim_offset_value[i] = calibrated_offset_value[i];
-    DAC_trim_gain_value[i] = calibrated_gain_value[i];
+    Vout_offset_value[i] = calibrated_offset_value[i];
+    Vout_gain_value[i] = calibrated_gain_value[i];
   }
 }
+
+
+Vout_controller::~Vout_controller(){
+  if(voltage_modify(ALL_vout_num,0))
+    std::cout << "voltage 0V error!"<<std::endl;
+  if(data_apply())
+    std::cout << "voltage 0V apply error!"<<std::endl;
+  if(offset_data_writer())
+    std::cout << "Offset saving error!"<<std::endl;
+}
+
 
 int Vout_controller::offset_data_reader(){
   std::fstream file_checker(FILE_name,std::fstream::in);
@@ -27,13 +38,13 @@ int Vout_controller::offset_data_reader(){
       if(type == "Group"){
         switch(num){
           case 0:
-            DAC0_offset_value = value;
+            Group0_offset_value = value;
             break;
           case 1:
-            DAC1_offset_value = value;
+            Group1_offset_value = value;
             break;
           case 2:
-            DAC2_offset_value = value;
+            Group234_offset_value = value;
             break;
           default:
             std::cout<<"Group offset number error"<<std::endl;
@@ -41,14 +52,14 @@ int Vout_controller::offset_data_reader(){
         }
       }else if(type == "Offset"){
         if((num >=0) && (num< MAX_channel_num))
-          DAC_trim_offset_value[num] = value;
+          Vout_offset_value[num] = value;
         else{
           std::cout<<"Offset number error"<<std::endl;
           return 1;
         }
       }else if(type == "Gain"){
         if((num >=0) && (num< MAX_channel_num))
-          DAC_trim_gain_value[num] = value;
+          Vout_gain_value[num] = value;
         else{
           std::cout<<"Offset number error"<<std::endl;
           return 1;
@@ -63,8 +74,8 @@ int Vout_controller::offset_data_reader(){
     file_checker.close();
     std::cout<<"No offset file found"<<std::endl;
     for(int i = 0; i<MAX_channel_num; i++){
-      DAC_trim_offset_value[i] = DAC_trim_offset_default;
-      DAC_trim_gain_value[i] = DAC_trim_gain_default;
+      Vout_offset_value[i] = Vout_offset_default;
+      Vout_gain_value[i] = Vout_gain_default;
     }
     offset_data_writer();
   }
@@ -75,13 +86,13 @@ int Vout_controller::offset_data_writer(){
   std::fstream file(FILE_name, std::fstream::out);
   file<<"type"<<","<<"number"<<","<<"value"<<std::endl;
 
-  file<<"Group"<<","<<0<<","<<DAC0_offset_value<<std::endl;
-  file<<"Group"<<","<<1<<","<<DAC1_offset_value<<std::endl;
-  file<<"Group"<<","<<2<<","<<DAC2_offset_value<<std::endl;
+  file<<"Group"<<","<<0<<","<<Group0_offset_value<<std::endl;
+  file<<"Group"<<","<<1<<","<<Group1_offset_value<<std::endl;
+  file<<"Group"<<","<<2<<","<<Group234_offset_value<<std::endl;
 
   for(int i = 0; i<MAX_channel_num; i++){
-    file<<"Offset"<<","<<i<<","<<DAC_trim_offset_value[i]<<std::endl;
-    file<<"Gain"<<","<<i<<","<<DAC_trim_gain_value[i]<<std::endl;
+    file<<"Offset"<<","<<i<<","<<Vout_offset_value[i]<<std::endl;
+    file<<"Gain"<<","<<i<<","<<Vout_gain_value[i]<<std::endl;
   }
 
   file.close();
@@ -92,13 +103,13 @@ int Vout_controller::offset_data_writer(){
 
 int Vout_controller::offset_refresh(){
   int result = 0;
-  result = result||offset_modify(DAC0_offset,0, DAC0_offset_value);
-  result = result||offset_modify(DAC1_offset,0, DAC1_offset_value);
-  result = result||offset_modify(DAC2_offset,0, DAC2_offset_value);
+  result = result||offset_modify(Group0_offset,0, Group0_offset_value);
+  result = result||offset_modify(Group1_offset,0, Group1_offset_value);
+  result = result||offset_modify(Group234_offset,0, Group234_offset_value);
 
   for(int i = 0;i<MAX_channel_num;i++){
-    result = result||offset_modify(DAC_trim_offset, i, DAC_trim_offset_value[i]);
-    result = result||offset_modify(DAC_trim_gain, i, DAC_trim_gain_value[i]);
+    result = result||offset_modify(Vout_offset, i, Vout_offset_value[i]);
+    result = result||offset_modify(Vout_gain, i, Vout_gain_value[i]);
   }
 
   result = result||data_apply();
@@ -151,27 +162,19 @@ int Vout_controller::addres_maker(int vout_num){
 int Vout_controller::data_sender(){
   sync.give_signal(30);
   int result = spi_comm.transmit(buffer, Serial_Word_Size);
-  struct timespec t12;
-  t12.tv_sec = 0;
-  t12.tv_nsec = 20;
-  nanosleep(&t12,NULL);
   return result;
 }
 
 int Vout_controller::data_apply() {
   sync.give_signal(30);
   int result = ldac.give_signal(20);
-  struct timespec t12;
-  t12.tv_sec = 0;
-  t12.tv_nsec = 20;
-  nanosleep(&t12,NULL);
   return result;
 }
 
 
-int Vout_controller::offset_modify(offset_values offset_num, int vout_function, int value){
+int Vout_controller::offset_modify(offset_types offset_num, int vout_function, int value){
 
-  if((value < 0)||(value > MAX_offset_gain)||(offset_num < DAC0_offset) ||(offset_num > DAC_trim_gain))
+  if((value < 0)||(value > MAX_offset_gain)||(offset_num < Group0_offset) ||(offset_num > Vout_gain))
     return 1;
   else if(!DAC_offset_switch)
     return 0;
@@ -179,23 +182,23 @@ int Vout_controller::offset_modify(offset_values offset_num, int vout_function, 
   int mode_bits = 0;
 
   switch(offset_num){
-    case DAC_trim_offset:
+    case Vout_offset:
       mode_bits = 2; //10
       vout_function = addres_maker(vout_function);
       break;
-    case DAC_trim_gain:
+    case Vout_gain:
       mode_bits = 1; //01
       vout_function = addres_maker(vout_function);
       break;
-    case DAC0_offset:
+    case Group0_offset:
       mode_bits = 0;
       vout_function = 0x2;
       break;
-    case DAC1_offset:
+    case Group1_offset:
       mode_bits = 0;
       vout_function = 0x3;
       break;
-    case DAC2_offset:
+    case Group234_offset:
       mode_bits = 0;
       vout_function = 0x4;
       break;
@@ -212,15 +215,15 @@ int Vout_controller::voltage_modify(int vout_num, float voltage){
   int offset_code;
   switch(Group_bit(vout_num)){
     case 1:
-      offset_code = DAC0_offset_value;
+      offset_code = Group0_offset_value;
       break;
     case 2:
-      offset_code = DAC1_offset_value;
+      offset_code = Group1_offset_value;
       break;
     case 3:
     case 4:
     case 5:
-      offset_code = DAC2_offset_value;
+      offset_code = Group234_offset_value;
       break;
     default:
       std::cout<<"wrong group bit"<<std::endl;
@@ -237,11 +240,10 @@ int Vout_controller::voltage_modify(int vout_num, float voltage){
 }
 
 int Vout_controller::print_all_offset(){
-  std::cout<<"Group_offset"<<std::endl<<DAC0_offset_value<<" "<<DAC1_offset_value<<" "<<DAC2_offset_value<<std::endl<<std::endl;
+  std::cout<<"Group_offset"<<std::endl<<Group0_offset_value<<" "<<Group1_offset_value<<" "<<Group234_offset_value<<std::endl<<std::endl;
   for(int i = 0;i<MAX_channel_num;i++){
     std::cout<<"Vout number "<<i<<std::endl;
-    std::cout<<DAC_trim_offset_value[i]<<" "<<DAC_trim_gain_value[i]<<std::endl;
+    std::cout<<Vout_offset_value[i]<<" "<<Vout_gain_value[i]<<std::endl;
   }
-
   return 0;
 }
