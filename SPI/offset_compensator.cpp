@@ -24,9 +24,14 @@ int main(int argc, char * argv[]){
     types = Group1_offset;
   else if(offset_name == "g2")
     types = Group234_offset;
-
-  std::cout << vout.offset_modify(types, vout_number, value)<< std::endl;
-  std::cout << vout.data_apply() << std::endl;
+  else{
+    std::cout << "error!"<<std::endl;
+    return 1;
+  }
+  int modify_result = vout.offset_modify(types, vout_number, value);
+  int apply_result = vout.data_apply();
+  std::cout << "offset modify : " << modify_result << std::endl;
+  std::cout << "data apply : "<< apply_result << std::endl;
 
   std::cin >> value;
 

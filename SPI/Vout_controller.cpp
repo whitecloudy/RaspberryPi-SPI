@@ -184,26 +184,31 @@ int Vout_controller::offset_modify(offset_types offset_num, int vout_function, i
   switch(offset_num){
     case Vout_offset:
       mode_bits = 2; //10
+      Vout_offset_value[vout_function] = value;
       vout_function = addres_maker(vout_function);
       break;
     case Vout_gain:
       mode_bits = 1; //01
+      Vout_gain_value[vout_function] = value;
       vout_function = addres_maker(vout_function);
       break;
     case Group0_offset:
       mode_bits = 0;
       vout_function = 0x2;
+      Group0_offset_value = value;
       break;
     case Group1_offset:
       mode_bits = 0;
       vout_function = 0x3;
+      Group1_offset_value = value;
       break;
     case Group234_offset:
       mode_bits = 0;
       vout_function = 0x4;
+      Group234_offset_value = value;
       break;
     default:
-      break;
+      return 1;
   }
 
   serial_word_maker(mode_bits, vout_function, value);

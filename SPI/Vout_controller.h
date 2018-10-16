@@ -45,7 +45,7 @@
 #define Group0_offset_default 0x1555
 #define Group1_offset_default 0x1555
 #define Group234_offset_default 0x1555
-#define DAC_offset_switch false
+#define DAC_offset_switch true
 
 #define Serial_Word_Size 3
 #define MODE_MASK 0xC0
@@ -98,6 +98,7 @@ class Vout_controller{
   public:
     Vout_controller();
     Vout_controller(int calibrated_offset_value[], int calibrated_gain_value[]);
+    ~Vout_controller();
     int offset_modify(offset_types offset_num, int vout_function, int value);
     int offset_refresh();
     int voltage_modify(int vout_num, float voltage);
