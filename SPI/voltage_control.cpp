@@ -11,7 +11,7 @@ int main(int argc, char * argv[]){
   Vout_controller vout;
   int vout_number = atoi(argv[1]);
   float volt = atof(argv[2]);
- 
+  
   int modify_result = vout.voltage_modify(vout_number, volt);
   int apply_result = vout.data_apply();
   

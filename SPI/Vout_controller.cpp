@@ -235,6 +235,12 @@ int Vout_controller::voltage_modify(int vout_num, float voltage){
       return 1;
   }
   int dac_value = voltage*16384/12 + offset_code;
+
+  if(dac_value > 0x3FFF)
+    dac_value = 0x3FFF;
+  else if(dac_value < 0)
+    dac_value = 0;
+
   dac_value = dac_value & MAX_offset_gain;
 
   serial_word_maker(mode_bits, addres_maker(vout_num), dac_value);
