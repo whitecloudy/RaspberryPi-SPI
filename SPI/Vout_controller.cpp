@@ -7,6 +7,8 @@
 Vout_controller::Vout_controller() : spi_comm(0, SPI_speed, SPI_DOWN_EDGE), ldac(LDAC_pin, GPIO_UP), sync(SYNC_pin, GPIO_DOWN){
   if(offset_data_reader())
     std::cout<<"Error : file input output crashed"<<std::endl;
+  if(offset_refresh())
+    std::cout <<"Initialize Failed"<<std::endl;
 }
 
 Vout_controller::Vout_controller(int calibrated_offset_value[], int calibrated_gain_value[]) : spi_comm(0, SPI_speed, SPI_DOWN_EDGE), ldac(LDAC_pin, GPIO_UP), sync(SYNC_pin, GPIO_DOWN){
@@ -14,6 +16,8 @@ Vout_controller::Vout_controller(int calibrated_offset_value[], int calibrated_g
     Vout_offset_value[i] = calibrated_offset_value[i];
     Vout_gain_value[i] = calibrated_gain_value[i];
   }
+  if(offset_refresh())
+    std::cout <<"Initialize Failed"<<std::endl;
 }
 
 
