@@ -219,8 +219,19 @@ int Vout_controller::offset_modify(offset_types offset_num, int vout_function, i
   return data_sender();
 }
 
-int Vout_controller::voltage_modify(int vout_num, float voltage){
+int Vout_controller::voltage_modify_bin(int vout_num, int code){
   int mode_bits = 3;
+  
+  serial_word_maker(mode_bits, addres_maker(vout_num), code);
+  int result = data_sender();
+  if(result)
+    std::cout<<"data send error : "<<result<<std::endl;
+
+  return result;
+
+}
+
+int Vout_controller::voltage_modify(int vout_num, float voltage){
   int offset_code;
   switch(Group_bit(vout_num)){
     case 1:
@@ -238,6 +249,7 @@ int Vout_controller::voltage_modify(int vout_num, float voltage){
       std::cout<<"wrong group bit"<<std::endl;
       return 1;
   }
+
   int dac_value = voltage*16384/12 + offset_code;
 
   if(dac_value > 0x3FFF)
@@ -247,11 +259,7 @@ int Vout_controller::voltage_modify(int vout_num, float voltage){
 
   dac_value = dac_value & MAX_offset_gain;
 
-  serial_word_maker(mode_bits, addres_maker(vout_num), dac_value);
-  int result = data_sender();
-  if(result)
-    std::cout<<"data send error : "<<result<<std::endl;
-  return result;
+  return voltage_modify_bin(vout_num, dac_value);
 }
 
 int Vout_controller::print_all_offset(){
