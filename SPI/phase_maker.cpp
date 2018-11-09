@@ -15,7 +15,9 @@ int main(int argc, char *argv[]){
   v_con.voltage_modify(ALL_vout_num, 0);
   v_con.voltage_modify(attenuator_num, 10);
   v_con.data_apply();
-  sleep(1);
+
+  int dummy;
+  std::cin<<dummy;
 
   v_con.voltage_modify(attenuator_num, 5);
   v_con.data_apply();
