@@ -33,7 +33,7 @@
 #define LDAC_pin 5
 #define SYNC_pin 6
 
-#define SPI_speed 10000
+#define SPI_speed 20000
 
 #define FILE_name "offset_saved_file.csv"
 
