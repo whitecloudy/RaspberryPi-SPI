@@ -26,7 +26,8 @@ int main(int argc, char *argv[]){
   target_num_a = attenuator_num;
 
 
-  v_con.voltage_modify(ALL_vout_num, 0);
+  v_con.voltage_modify(target_num_p, 0);
+  v_con.voltage_modify(target_num_a, 5);
   v_con.data_apply();
 
   float voltage = 0.1;
@@ -35,19 +36,19 @@ int main(int argc, char *argv[]){
 
 
   if(!DEBUG_MODE){
-    v_con.voltage_modify(target_num_a, 1);
+    v_con.voltage_modify(target_num_a, 10);
     v_con.data_apply();
     delayMicroseconds(sleep_microtime);
 
-    v_con.voltage_modify(target_num_a, 0);
+    v_con.voltage_modify(target_num_a, 5);
     v_con.data_apply();
     delayMicroseconds(sleep_microtime);
 
-    v_con.voltage_modify(target_num_a, 1);
+    v_con.voltage_modify(target_num_a, 10);
     v_con.data_apply();
     delayMicroseconds(sleep_microtime);
 
-    v_con.voltage_modify(target_num_a, 0);
+    v_con.voltage_modify(target_num_a, 5);
     v_con.data_apply();
     delayMicroseconds(sleep_microtime);
 
@@ -57,19 +58,19 @@ int main(int argc, char *argv[]){
       delayMicroseconds(sleep_microtime);
     }
 
-    v_con.voltage_modify(ALL_vout_num, 0);
+    v_con.voltage_modify(target_num_p, 0);
     v_con.data_apply();
     delayMicroseconds(sleep_microtime);
 
-   // for(voltage = 0.1; voltage <= 10; voltage += 0.1){
-   //   v_con.voltage_modify(target_num_a, voltage);
-   //   v_con.data_apply();
-   //   delayMicroseconds(sleep_microtime);
-   // }
-
-    v_con.voltage_modify(ALL_vout_num, 0);
+    for(voltage = 5.1; voltage <= 10; voltage += 0.1){
+      v_con.voltage_modify(target_num_a, voltage);
+      v_con.data_apply();
+      delayMicroseconds(sleep_microtime);
+    }
+    v_con.voltage_modify(target_num_a, 5);
     v_con.data_apply();
     delayMicroseconds(sleep_microtime);
+
   }else{
     v_con.voltage_modify(target_num_a, 5);
     v_con.data_apply();
@@ -97,8 +98,7 @@ int main(int argc, char *argv[]){
 
 
 
-  }
-
+  } 
   std::cout <<"done"<<std::endl;
   std::cin >> dummy;
   return 0;
