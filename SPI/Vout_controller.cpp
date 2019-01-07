@@ -164,14 +164,14 @@ int Vout_controller::addres_maker(int vout_num){
 }
 
 int Vout_controller::data_sender(){
-  sync.give_signal(30);
+  sync.give_signal();
   int result = spi_comm.transmit(buffer, Serial_Word_Size);
   return result;
 }
 
 int Vout_controller::data_apply() {
-  sync.give_signal(30);
-  int result = ldac.give_signal(20);
+  sync.give_signal();
+  int result = ldac.give_signal();
   return result;
 }
 

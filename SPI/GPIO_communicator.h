@@ -12,6 +12,6 @@ class GPIO_communicator{
     int default_status;
   public:
     GPIO_communicator(int pin_number, int start_status);
-    int give_signal(int nano_time);
+    int give_signal();
     ~GPIO_communicator();
 };

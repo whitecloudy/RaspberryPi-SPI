@@ -8,18 +8,15 @@ GPIO_communicator::GPIO_communicator(int pin_number, int start_status){
   digitalWrite(pin_num, default_status);
 }
 
-int GPIO_communicator::give_signal(int nano_time){
-  struct timespec t1;
-  t1.tv_sec = 0;
-  t1.tv_nsec = nano_time;
+int GPIO_communicator::give_signal(){
 
   digitalWrite(pin_num, !default_status);
-  int result = nanosleep(&t1,NULL);
+  delayMicroseconds(1);
   digitalWrite(pin_num, default_status);
-  result &= nanosleep(&t1,NULL);
+  delayMicroseconds(1);
   
 
-  return result;
+  return 0;
 }
 
 GPIO_communicator::~GPIO_communicator(){
