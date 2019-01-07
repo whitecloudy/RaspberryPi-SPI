@@ -67,9 +67,20 @@ int main(int argc, char *argv[]){
       v_con.data_apply();
       delayMicroseconds(sleep_microtime);
     }
+
     v_con.voltage_modify(target_num_a, 5);
     v_con.data_apply();
     delayMicroseconds(sleep_microtime);
+
+    v_con.voltage_modify(target_num_a, 10);
+    v_con.data_apply();
+    delayMicroseconds(sleep_microtime);
+
+    v_con.voltage_modify(target_num_a, 5);
+    v_con.data_apply();
+    delayMicroseconds(sleep_microtime);
+
+
 
   }else{
     v_con.voltage_modify(target_num_a, 5);
