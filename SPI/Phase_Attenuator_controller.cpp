@@ -12,7 +12,6 @@ int Phase_Attenuator_controller::load_cal_data(void){
     float ph_V, po_V, phase, power;
     int j = 0;
     while(csv_reader.read_row(phase, power, ph_V, po_V)){
- //     std::cout<<phase<<", "<<power<<std::endl;
 
       V_preset[i][j].phase = phase;
       V_preset[i][j].power = power;
@@ -31,12 +30,43 @@ int preset_finder(struct cal_ref * V_preset, int start, int end, float phase){
   int middle = (start + end)/2;
 
   std::cout<<start<<", "<<middle<<", "<<end<< " || "<<phase<< " || "<<V_preset[middle].phase<<std::endl;
-  if((V_preset[middle].phase < phase) && (V_preset[middle+1].phase >= phase)){
-    if((phase - V_preset[middle].phase) > (V_preset[middle+1].phase - phase))
-      return middle+1;
-    else
-      return middle;
+  
+  float minus, center, plus;
+  int minus_index, center_index, plus_index;
+
+  if(middle==0){
+    minus_index = CAL_data_length-1;
+    center_index = 0;
+    plus_index = 1;
+    minus = V_preset[minus_index].phase -360;
+    center = V_preset[center_index].phase;
+    plus = V_preset[plus_index].phase;
+  }else if(middle==CAL_data_length-1){
+    minus_index = CAL_data_length-2;
+    center_index = CAL_data_length -1;
+    plus_index = 0;
+    minus = V_preset[minus_index].phase;
+    center = V_preset[center_index].phase;
+    plus = V_preset[plus_index].phase + 360;
+  }else{
+    minus_index = middle-1;
+    center_index = middle;
+    plus_index = middle+1;
+    minus = V_preset[minus_index].phase;
+    center = V_preset[center_index].phase;
+    plus = V_preset[plus_index].phase;
   }
+
+  if((center < phase) && (plus >= phase)){
+    if((phase - center) > (plus - phase))
+      return plus_index;
+    else
+      return center_index;
+  }else if((center >= phase) && (minus < phase)){
+    if((phase - minus) > (center - phase))
+      return center_index;
+    else
+      return minus_index;
 
   if(V_preset[middle].phase > phase)
     return preset_finder(V_preset, start, middle, phase);
@@ -46,7 +76,6 @@ int preset_finder(struct cal_ref * V_preset, int start, int end, float phase){
 }
 
 int Phase_Attenuator_controller::find_matched_preset(int ant, float phase){
-  std::cout<<V_preset[ant][198].phase<<std::endl;
   return preset_finder(V_preset[ant], 0, CAL_data_length-1, phase);
 }
 
