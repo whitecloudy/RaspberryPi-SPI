@@ -72,9 +72,12 @@ class Phase_Attenuator_controller{
 
   public:
     Phase_Attenuator_controller(void);
+    Phase_Attenuator_controller(int);
+    Phase_Attenuator_controller(float);
     int phase_control(int, int);
     int phase_control(int, float);
     int data_apply();
+    void print_integer_index(void);
 };
 
 #endif

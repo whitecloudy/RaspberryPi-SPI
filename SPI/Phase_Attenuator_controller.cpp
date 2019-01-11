@@ -94,3 +94,33 @@ Phase_Attenuator_controller::Phase_Attenuator_controller(void){
     std::cout<<"Error : Loading calibration data failed"<<std::endl;
   set_integer_index();
 }
+
+Phase_Attenuator_controller::Phase_Attenuator_controller(int phase){
+  if(!load_cal_data())
+    std::cout<<"Error : Loading calibration data failed"<<std::endl;
+  set_integer_index();
+
+  int result = 0;
+  for(int i = 0; i<ANT_num; i++){
+    result = result || ctrl.phase_control(i, phase);
+  }
+  result = result || data_apply();
+
+  if(result)
+    std::cout<<"Error : Phase initalize error"<<std::endl;
+}
+
+Phase_Attenuator_controller::Phase_Attenuator_controller(float phase){
+  if(!load_cal_data())
+    std::cout<<"Error : Loading calibration data failed"<<std::endl;
+  set_integer_index();
+
+  int result = 0;
+  for(int i = 0; i<ANT_num; i++){
+    result = result || ctrl.phase_control(i, phase);
+  }
+  result = result || data_apply();
+
+  if(result)
+    std::cout<<"Error : Phase initalize error"<<std::endl;
+}
