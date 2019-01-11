@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <wiringPi.h>
 #include "Vout_controller.h"
-#include "phase_attenuator_controller.h"
+#include "Phase_Attenuator_controller.h"
 
 #define DEBUG_MODE false
 

@@ -8,13 +8,17 @@ int Phase_Attenuator_controller::load_cal_data(void){
     std::string filename = "calibration_data/ant" + std::to_string(i) + "_cal_data";
     io::CSVReader<4> csv_reader(filename);
 
+
     float ph_V, po_V, phase, power;
     int j = 0;
     while(csv_reader.read_row(phase, power, ph_V, po_V)){
+ //     std::cout<<phase<<", "<<power<<std::endl;
+
       V_preset[i][j].phase = phase;
       V_preset[i][j].power = power;
       V_preset[i][j].ph_V = ph_V;
       V_preset[i][j].po_V = po_V;
+      j++;
     }
   }
 
@@ -23,9 +27,10 @@ int Phase_Attenuator_controller::load_cal_data(void){
  
 }
 
-inline int preset_finder(struct cal_ref * V_preset, int start, int end, float phase){
+int preset_finder(struct cal_ref * V_preset, int start, int end, float phase){
   int middle = (start + end)/2;
 
+  std::cout<<start<<", "<<middle<<", "<<end<< " || "<<phase<< " || "<<V_preset[middle].phase<<std::endl;
   if((V_preset[middle].phase < phase) && (V_preset[middle+1].phase >= phase)){
     if((phase - V_preset[middle].phase) > (V_preset[middle+1].phase - phase))
       return middle+1;
@@ -33,7 +38,7 @@ inline int preset_finder(struct cal_ref * V_preset, int start, int end, float ph
       return middle;
   }
 
-  if(V_preset[middle].phase <= phase)
+  if(V_preset[middle].phase > phase)
     return preset_finder(V_preset, start, middle, phase);
   else
     return preset_finder(V_preset, middle+1, end, phase);
@@ -41,6 +46,7 @@ inline int preset_finder(struct cal_ref * V_preset, int start, int end, float ph
 }
 
 int Phase_Attenuator_controller::find_matched_preset(int ant, float phase){
+  std::cout<<V_preset[ant][198].phase<<std::endl;
   return preset_finder(V_preset[ant], 0, CAL_data_length-1, phase);
 }
 
