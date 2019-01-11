@@ -2,7 +2,8 @@
 #include "Phase_Attenuator_controller.h"
 
 int main(void){
-  int ant = 0, double phase = 0.0;
+  int ant = 0;
+  float phase = 0;
   Phase_Attenuator_controller ctrl(0);
   
    while(true){
