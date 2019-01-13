@@ -123,6 +123,10 @@ int Phase_Attenuator_controller::data_apply(void){
   return V.data_apply();
 }
 
+int ant_off(int ant_num){
+  return V.voltage_modify(ATTENUATOR[ant_num], 0);
+}
+
 
 Phase_Attenuator_controller::Phase_Attenuator_controller(void){
   if(load_cal_data())

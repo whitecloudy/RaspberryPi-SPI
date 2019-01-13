@@ -76,6 +76,7 @@ class Phase_Attenuator_controller{
     Phase_Attenuator_controller(float);
     int phase_control(int, int);
     int phase_control(int, float);
+    int ant_off(int);
     int data_apply();
     void print_integer_index(void);
 };
