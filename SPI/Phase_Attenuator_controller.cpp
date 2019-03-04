@@ -72,7 +72,6 @@ int preset_finder(struct cal_ref * V_preset, int start, int end, float phase){
     return preset_finder(V_preset, start, middle, phase);
   else
     return preset_finder(V_preset, middle+1, end, phase);
-  
 }
 
 int Phase_Attenuator_controller::find_matched_preset(int ant, float phase){
