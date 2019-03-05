@@ -29,7 +29,7 @@ int Phase_Attenuator_controller::load_cal_data(void){
 int preset_finder(struct cal_ref * V_preset, int start, int end, float phase){
   int middle = (start + end)/2;
 
-  std::cout<<start<<", "<<middle<<", "<<end<< " || "<<phase<< " || "<<V_preset[middle].phase<<std::endl;
+  //std::cout<<start<<", "<<middle<<", "<<end<< " || "<<phase<< " || "<<V_preset[middle].phase<<std::endl;
   
   float minus, center, plus;
   int minus_index, center_index, plus_index;
@@ -67,6 +67,7 @@ int preset_finder(struct cal_ref * V_preset, int start, int end, float phase){
       return center_index;
     else
       return minus_index;
+  }
 
   if(V_preset[middle].phase > phase)
     return preset_finder(V_preset, start, middle, phase);
@@ -123,7 +124,7 @@ int Phase_Attenuator_controller::data_apply(void){
   return V.data_apply();
 }
 
-int ant_off(int ant_num){
+int Phase_Attenuator_controller::ant_off(int ant_num){
   return V.voltage_modify(ATTENUATOR[ant_num], 0);
 }
 

@@ -11,7 +11,7 @@ int main(int argc, char *argv[]){
   Vout_controller v_con;
 
   if(argc != 3){
-    std::cout<<"notenough argument"<<std::endl;
+    std::cout<<"notenough argument\a"<<std::endl;
     return 0;
   }
 
@@ -36,35 +36,38 @@ int main(int argc, char *argv[]){
 
 
   if(!DEBUG_MODE){
-    v_con.voltage_modify(target_num_a, 10);
-    v_con.data_apply();
-    delayMicroseconds(sleep_microtime);
+    //v_con.voltage_modify(target_num_a, 10);
+    //v_con.data_apply();
+    //delayMicroseconds(sleep_microtime);
 
-    v_con.voltage_modify(target_num_a, 5);
-    v_con.data_apply();
-    delayMicroseconds(sleep_microtime);
+    //v_con.voltage_modify(target_num_a, 5);
+    //v_con.data_apply();
+    //delayMicroseconds(sleep_microtime);
 
-    v_con.voltage_modify(target_num_a, 10);
-    v_con.data_apply();
-    delayMicroseconds(sleep_microtime);
+    //v_con.voltage_modify(target_num_a, 10);
+    //v_con.data_apply();
+    //delayMicroseconds(sleep_microtime);
 
-    v_con.voltage_modify(target_num_a, 5);
-    v_con.data_apply();
-    delayMicroseconds(sleep_microtime);
+    //v_con.voltage_modify(target_num_a, 5);
+    //v_con.data_apply();
+    //delayMicroseconds(sleep_microtime);
 
-    for(; voltage <= 10; voltage += 0.1){
+    for(voltage = 0.0; voltage <= 10; voltage += 0.1){
       v_con.voltage_modify(target_num_p, voltage);
       v_con.data_apply();
+      std::cout<<"Phase voltage = "<<voltage<<std::endl;
       delayMicroseconds(sleep_microtime);
     }
 
     v_con.voltage_modify(target_num_p, 0);
     v_con.data_apply();
+    std::cout<<"Attenuator voltage = "<<5.0<<std::endl;
     delayMicroseconds(sleep_microtime);
 
     for(voltage = 5.1; voltage <= 10; voltage += 0.1){
       v_con.voltage_modify(target_num_a, voltage);
       v_con.data_apply();
+      std::cout<<"Attenuator voltage = "<<voltage<<std::endl;
       delayMicroseconds(sleep_microtime);
     }
 
@@ -72,13 +75,13 @@ int main(int argc, char *argv[]){
     v_con.data_apply();
     delayMicroseconds(sleep_microtime);
 
-    v_con.voltage_modify(target_num_a, 10);
-    v_con.data_apply();
-    delayMicroseconds(sleep_microtime);
+    //v_con.voltage_modify(target_num_a, 10);
+    //v_con.data_apply();
+    //delayMicroseconds(sleep_microtime);
 
-    v_con.voltage_modify(target_num_a, 5);
-    v_con.data_apply();
-    delayMicroseconds(sleep_microtime);
+    //v_con.voltage_modify(target_num_a, 5);
+    //v_con.data_apply();
+    //delayMicroseconds(sleep_microtime);
 
 
 
@@ -110,7 +113,7 @@ int main(int argc, char *argv[]){
 
 
   } 
-  std::cout <<"done"<<std::endl;
+  std::cout <<"done\a"<<std::endl;
   std::cin >> dummy;
   return 0;
 }
