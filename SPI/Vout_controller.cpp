@@ -5,6 +5,7 @@
 #include <string>
 
 Vout_controller::Vout_controller() : spi_comm(0, SPI_speed, SPI_DOWN_EDGE), ldac(LDAC_pin, GPIO_UP), sync(SYNC_pin, GPIO_DOWN){
+  std::cout<<"Vout controller initialize"<<std::endl;
   if(offset_data_reader())
     std::cout<<"Error : file input output crashed"<<std::endl;
   if(offset_refresh())
@@ -12,6 +13,7 @@ Vout_controller::Vout_controller() : spi_comm(0, SPI_speed, SPI_DOWN_EDGE), ldac
 }
 
 Vout_controller::Vout_controller(int calibrated_offset_value[], int calibrated_gain_value[]) : spi_comm(0, SPI_speed, SPI_DOWN_EDGE), ldac(LDAC_pin, GPIO_UP), sync(SYNC_pin, GPIO_DOWN){
+  std::cout<<"Vout controller initialize"<<std::endl;
   for(int i = 0; i<MAX_channel_num; i++){
     Vout_offset_value[i] = calibrated_offset_value[i];
     Vout_gain_value[i] = calibrated_gain_value[i];

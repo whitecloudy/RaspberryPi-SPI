@@ -7,6 +7,7 @@
 int main(int argc, char ** argv) {
   int ant_amount = argc - 2;
   int * ant_nums = new int[ant_amount];
+  std::cout << "beamforming starts"<<std::endl;
   Phase_Attenuator_controller ctrl;
 
   int BEAMFORMING = atoi(argv[1]);
@@ -19,7 +20,7 @@ int main(int argc, char ** argv) {
   ctrl.data_apply();
 
   //do beamforming
-  if(BEAMFORMING){
+  if(BEAMFORMING==1){
     //first antenna doesn't need phase shift
     ctrl.phase_control(ant_nums[0],0);
     for(int i = 1; i<ant_amount; i++){
@@ -44,7 +45,7 @@ int main(int argc, char ** argv) {
     }
   }
   //do random phase multi antenna
-  else{
+  else if(BEAMFORMING==0){
     srand(time(NULL));
 
     for(int i = 0; i<ant_amount; i++){
@@ -54,6 +55,11 @@ int main(int argc, char ** argv) {
        ctrl.data_apply();
        std::cout<<phase<<" degree"<<std::endl;
     }
+  }else if(BEAMFORMING==2){
+    for(int i = 0;i<ant_amount;i++){
+      ctrl.phase_control(ant_nums[i], 0);
+    }
+    ctrl.data_apply();
   }
 
   std::cin.get();

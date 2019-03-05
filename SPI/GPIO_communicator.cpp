@@ -1,6 +1,7 @@
 #include "GPIO_communicator.h"
 
 GPIO_communicator::GPIO_communicator(int pin_number, int start_status){
+  std::cout <<"GPIO communicator intializer"<<std::endl;
   wiringPiSetup();
   pinMode(pin_number, OUTPUT);
   pin_num = pin_number;
